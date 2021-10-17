@@ -1,22 +1,19 @@
 import os
 from os import listdir
-from os.path import join
+from os import makedirs
+from os.path import join, isdir
 import json
-import pandas as pd
-import matplotlib.pyplot as plt
 import random
-import IPython.display as ipd
-import librosa
-import numpy as np
 import shutil
-from shutil import copyfile
-import pandas as pd
 import argparse
+import numpy as np
+import pandas as pd
+import librosa
+import sox
 
 
 def filter_single_labeled(ann, inter_nodes):
     # get single-labeled filenames and classes
-
     class_to_file = dict()
     file_to_class = dict()
 
@@ -35,7 +32,7 @@ def filter_single_labeled(ann, inter_nodes):
     return class_to_file, file_to_class
 
 
-def filter_pp_rating(ratings, vocab, inter_nodes, files): #file_to_class, class_to_file
+def filter_pp_rating(ratings, vocab, inter_nodes, files):
     # get all files that have a single leaf label with pp rating from all annotators
     singlePP_files = []
     for file in files:
@@ -61,9 +58,16 @@ def filter_class_occrrences(min_occur, class_to_file):
     return {cl:class_to_file[cl] for cl in class_to_file if len(class_to_file[cl]) >= min_occur}
 
 
+def trim_edge_silence(audiofile, outfile, silence_threshold, min_silence_duration):
+    tfm = sox.Transformer()
+    tfm.silence(location=1, silence_threshold=silence_threshold, min_silence_duration=min_silence_duration)
+    tfm.silence(location=-1, silence_threshold=silence_threshold, min_silence_duration=min_silence_duration)
+    tfm.build(audiofile, outfile)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--fsdpath', type=str, default='./fsd50k', help='path to FSD50K data folder.')
+    parser.add_argument('--fsdpath', type=str, required=True, help='path to FSD50K data folder.')
     parser.add_argument('--outpath', type=str, default='./', help='path to save reorganized FSD50K audio files for the'
                                                                   'following Scaper generation.')
     parser.add_argument('--max_clip_duration', type=int, default=4, help='max duration for each clip in sec)')
@@ -99,12 +103,11 @@ if __name__ == '__main__':
     PP_files_dev = filter_pp_rating(ratings, vocab, inter_nodes, files=list(file_to_class_dev.keys()))
 
     # Get dev and eval files with duration shorter than max_duration
-    short_files_dev = filter_duration(
-        max_duration=args.max_duration, audiopath=join(args.fsdpath, 'FSD50K.dev_audio'), files=PP_files_dev
-    )
-    short_files_eval = filter_duration(
-        max_duration=args.max_duration, audiopath=join(args.fsdpath, 'FSD50K.eval_audio'), files=list(file_to_class_eval.keys())
-    )
+    audiopath_dev = join(args.fsdpath, 'FSD50K.dev_audio')
+    audiopath_eval = join(args.fsdpath, 'FSD50K.eval_audio')
+
+    short_files_dev = filter_duration(max_duration=args.max_duration, audiopath=audiopath_dev, files=PP_files_dev)
+    short_files_eval = filter_duration(max_duration=args.max_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
 
     # Get dictionaries with filtered files: single-labeled, PP-rating, shorter than max duration
     class_to_shortPP_file_dev = {cl: list(set(class_to_file_dev[cl]) & set(short_files_dev)) for cl in class_to_file_dev}
@@ -117,6 +120,8 @@ if __name__ == '__main__':
                                                                class_to_file=class_to_short_file_eval)
 
     # Load class lists for each split
+    with open("all_tag.json") as f:
+        all_tag = json.load(f)
     with open("train_tag.json") as f:
         train_tag = json.load(f)
     with open("val_tag.json") as f:
@@ -125,32 +130,52 @@ if __name__ == '__main__':
         test_tag = json.load(f)
 
     
-    # Copy files to new folders where each folder is named by a class label
-    audiopath = join(datapath, 'FSD50K.eval_audio')
+    # Trim files and save to new folders where each folder is named by a class label
+    for cl in common_class_to_shortPP_file_dev:
+        if cl in train_tag:
+            outpath = join(args.outpath, 'foreground', 'base', 'train', str(all_tag.index(cl)))
+        elif cl in val_tag:
+            outpath = join(args.outpath, 'foreground', 'val', str(all_tag.index(cl)))
+        else:
+            outpath = join(args.outpath, 'foreground', 'test', str(all_tag.index(cl)))
 
-    for cl in class_short_file_eval_filtered:
-        folderpath = join(datapath, 'scaper', 'foreground', str(all_tag.index(cl)))
-        for fname in class_short_file_eval_filtered[cl]:
-            copyfile(join(audiopath, fname + '.wav'), join(folderpath, fname + '.wav'))
+        if not isdir(outpath):
+            makedirs(outpath)
 
+        for file in common_class_to_shortPP_file_dev[cl]:
+            trim_edge_silence(
+                audiofile=join(audiopath_dev, file+ '.wav'), outfile=join(outpath, file+ '.wav'), silence_threshold=0.1, min_silence_duration=0.05
+            )
 
-    # inter_nodes = ['Aircraft', 'Alarm', 'Animal', 'Bell', 'Bicycle', 'Bird',
-    #                'Bird_vocalization_and_bird_call_and_bird_song', 'Brass_instrument', 'Breathing', 'Car',
-    #                'Cat', 'Chime', 'Clock', 'Cymbal', 'Dog', 'Domestic_animals_and_pets', 'Domestic_sounds_and_home_sounds',
-    #                'Door', 'Drum', 'Engine', 'Explosion', 'Fire', 'Fowl', 'Glass', 'Guitar', 'Hands',
-    #                'Human_group_actions', 'Human_voice', 'Insect', 'Keyboard_(musical)', 'Laughter',
-    #                'Liquid', 'Mallet_percussion', 'Mechanisms',' Motor_vehicle_(road)', 'Music', 'Musical_instrument',
-    #                'Ocean', 'Percussion', 'Plucked_string_instrument', 'Pour', 'Power_tool', 'Rail_transport',
-    #                'Rain', 'Respiratory_sounds', 'Shout', 'Singing', 'Speech', 'Telephone', 'Thunderstorm',
-    #                'Tools', 'Typing', 'Vehicle', 'Water', 'Wild_animals', 'Wood']
+    for cl in common_class_to_short_file_eval:
+        if cl in train_tag:
+            outpath = join(args.outpath, 'foreground', 'base', 'test', str(all_tag.index(cl)))
+        elif cl in val_tag:
+            outpath = join(args.outpath, 'foreground', 'val', str(all_tag.index(cl)))
+        else:
+            outpath = join(args.outpath, 'foreground', 'test', str(all_tag.index(cl)))
 
+        if not isdir(outpath):
+            makedirs(outpath)
 
+        for file in common_class_to_shortPP_file_dev[cl]:
+            trim_edge_silence(
+                audiofile=join(audiopath_eval, file+'.wav'), outfile=join(outpath, file+'.wav'), silence_threshold=0.1, min_silence_duration=0.05
+            )
 
-    # singlePP_file_to_class = {file:file_to_class[file] for file in singlePP_files}
-    # class_to_singlePP_file = {cl:list(set(class_to_file[cl] & set(singlePP_files))) for cl in class_to_file}
-    # # remove classes that do not have any single-PP files
-    # for cl in class_to_singlePP_file:
-    #     if len(class_to_singlePP_file[cl]) == 0:
-    #         del class_to_singlePP_file[cl]
-    #
-    # return class_to_singlePP_file, singlePP_file_to_class
+    # Split train/val examples in base classes
+    for cl in train_tag:
+        train_path = join(args.outpath, 'foreground', 'base', 'train', str(cl))
+        val_path =  join(args.outpath, 'foreground', 'base', 'val', str(cl))
+        if not isdir(val_path):
+            makedirs(val_path)
+
+        # shuffle all files in the folder
+        fnames = [f for f in listdir(train_path) if '.wav' in f]
+        n_val = int(np.ceil(len(fnames) * 0.15))
+        random.shuffle(fnames)
+
+        # move a portion of files to the val folder
+        f_val = fnames[:n_val]
+        for f in f_val:
+            shutil.move(join(train_path, f), join(val_path, f))
