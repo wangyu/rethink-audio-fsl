@@ -14,8 +14,7 @@ parser.add_argument('--checkpoint', type=int, default=0, help='checkpoint (epoch
 parser.add_argument('--num_workers', type=int, default=4, help='number of data loading workers')
 parser.add_argument('--cuda', type=bool, default=True, help='enables cuda')
 parser.add_argument('--disp_step', type=int, default=200, help='display step during training')
-parser.add_argument('--inlen', type=int, default=10, help='input length (sec)')
-parser.add_argument('--openl3', action='store_true', help='use reduced classes')
+parser.add_argument('--openl3', action='store_true', help='use openl3emb as input representation')
 parser.add_argument('--poly', type=str, default='1', help='polyphony of support examples')
 
 args = parser.parse_args()
@@ -35,8 +34,8 @@ data_train_opt = config['data_train_opt']
 data_test_opt = config['data_test_opt']
 
 train_split, test_split = 'train', 'val'
-dataset_train = FSD_MIX_CLIPS(phase=train_split, inlen=args.inlen, openl3=args.openl3)
-dataset_test = FSD_MIX_CLIPS(phase=test_split, inlen=args.inlen, openl3=args.openl3)
+dataset_train = FSD_MIX_CLIPS(phase=train_split, openl3=args.openl3)
+dataset_test = FSD_MIX_CLIPS(phase=test_split, openl3=args.openl3)
 
 dloader_train = FewShotDataloader(
     dataset=dataset_train,
@@ -70,9 +69,7 @@ if args.cuda: # enable cuda
     algorithm.load_to_gpu()
 
 if args.checkpoint != 0: # load checkpoint
-    algorithm.load_checkpoint(
-        epoch=args.checkpoint if (args.checkpoint > 0) else '*',
-        train=True)
+    algorithm.load_checkpoint(epoch=args.checkpoint if (args.checkpoint > 0) else '*', train=True)
 
 # train the algorithm
 algorithm.solve(dloader_train, dloader_test)
