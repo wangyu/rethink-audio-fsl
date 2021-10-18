@@ -1,6 +1,7 @@
 import os
 from os import makedirs, listdir
 from os.path import join, isdir
+from tqdm import tqdm
 import scaper
 import argparse
 
@@ -14,14 +15,14 @@ def generate(jamspath, sourcepath, savepath, class_split, data_split):
     # For base classes, data are further split into train/val/test folders
     if data_split:
         jamsfolder = join(jamsfolder, data_split)
-        savefolder = join(savefolder, 'FSD_MIX_SED.audio', data_split)
+        savefolder = join(savefolder, data_split)
         fg_path = join(fg_path, data_split)
 
     if not isdir(savefolder):
         makedirs(savefolder)
 
     # generate audio files given jams files
-    for fname in listdir(jamsfolder)[:1]:
+    for fname in tqdm(listdir(jamsfolder)):
         jamsfile = join(jamsfolder, fname)
         savefile = join(savefolder, fname.replace('.jams', '.wav'))
 
