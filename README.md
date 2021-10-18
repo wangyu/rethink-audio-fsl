@@ -2,8 +2,8 @@
 This repo contains the source code for the paper "Who calls the shots? Rethinking Few-Shot Learning for Audio." (WASPAA 2021)
 
 **Table of Contents**
-- [Setup](#setup)
 - [Dataset](#dataset)
+- [Setup](#setup)
 - [Experiment](#experiment)
   - [Preprocessing](#preprocessing)
   - [Training](#training)
@@ -18,7 +18,9 @@ This repo contains the source code for the paper "Who calls the shots? Rethinkin
 ```
 git clone git@github.com:wangyu/rethink-audio-fsl.git 
 ```
-2. Create `conda` environment from the `environment.yml` file and activate it.
+2. Create `conda` environment from the `environment.yml` file and activate it. 
+
+Note that you only need the environment if you want to train/evaluate the models. For reproducing the dataset, go to [Dataset](#dataset).   
 ```
 conda env create -f environment.yml
 conda activate dfsl
@@ -31,7 +33,8 @@ Due to the large size of the dataset, instead of releasing the raw audio files, 
 
 To reproduce FSD-MIX-SED:
 1. Download source material and jams files from [Zenodo](https://zenodo.org/record/5574135#.YWyINEbMIWo).
-2. Generate soundscapes from jams files by running:
+2. Install [Scaper](https://github.com/justinsalamon)
+3. Generate soundscapes from jams files by running:
 ```
 python ./data/generate_soundscapes.py \
 --annpath PATH-TO-FSD_MIX_SED.annotations \
