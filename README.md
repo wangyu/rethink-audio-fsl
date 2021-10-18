@@ -20,28 +20,29 @@ git clone git@github.com:wangyu/rethink-audio-fsl.git
 ```
 2. Create `conda` environment from the `environment.yml` file and activate it. 
 
-Note that you only need the environment if you want to train/evaluate the models. For reproducing the dataset, go to [Dataset](#dataset).   
+Note that you only need the environment if you want to train/evaluate the models. For reproducing the dataset, see [Dataset](#dataset).   
 ```
 conda env create -f environment.yml
 conda activate dfsl
 ```
 
 ## Dataset
-Models in this work are trained on [FSD-MIX-CLIPS](https://zenodo.org/record/5574135#.YWyINEbMIWo), an open dataset of programmatically mixed audio clips with a controlled level of polyphony and signal-to-noise ratio. We use single-labeled clips from [FSD50K](https://zenodo.org/record/4060432#.YWyLAEbMIWo) as the source material for the foreground sound events and Brownian noise as the background to generate 281,039 10-second strongly-labeled soundscapes with [Scaper]. We refer this (intermediate) dataset of 10s soundscapes as FSD-MIX-SED. Each soundscape contains n events from n different sound classes where n is ranging from 1 to 5. We then extract 614,533 1s clips centered on each sound event in the soundscapes in FSD-MIX-SED to produce FSD-MIX-CLIPS. 
+Models in this work are trained on [FSD-MIX-CLIPS](https://zenodo.org/record/5574135#.YWyINEbMIWo), an open dataset of programmatically mixed audio clips with a controlled level of polyphony and signal-to-noise ratio. We use single-labeled clips from [FSD50K](https://zenodo.org/record/4060432#.YWyLAEbMIWo) as the source material for the foreground sound events and Brownian noise as the background to generate 281,039 10-second strongly-labeled soundscapes with [Scaper](https://github.com/justinsalamon). We refer this (intermediate) dataset of 10s soundscapes as FSD-MIX-SED. Each soundscape contains n events from n different sound classes where n is ranging from 1 to 5. We then extract 614,533 1s clips centered on each sound event in the soundscapes in FSD-MIX-SED to produce FSD-MIX-CLIPS. 
 
-Due to the large size of the dataset, instead of releasing the raw audio files, we release the source material and soundscape annotations in JAMS format, which can be used to reproduce FSD-MIX-SED using [Scaper](https://github.com/justinsalamon). All clips in FSD-MIX-CLIPS are extracted from FSD-MIX-SED. Therefore, for FSD-MIX-CLIPS, instead of releasing duplicated audio content, we provide annotations that specify the filename in FSD-MIX-SED and the corresponding starting time (in second) of each 1-second clip.  
+Due to the large size of the dataset, instead of releasing the raw audio files, we release the source material, a subset of FSD50K, and soundscape annotations in JAMS format which can be used to reproduce FSD-MIX-SED using Scaper. All clips in FSD-MIX-CLIPS are extracted from FSD-MIX-SED. Therefore, for FSD-MIX-CLIPS, instead of releasing duplicated audio content, we provide annotations that specify the filename in FSD-MIX-SED and the corresponding starting time (in second) of each 1-second clip.  
 
 To reproduce FSD-MIX-SED:
 1. Download source material and jams files from [Zenodo](https://zenodo.org/record/5574135#.YWyINEbMIWo).
-2. Install [Scaper](https://github.com/justinsalamon)
-3. Generate soundscapes from jams files by running:
+2. Extract `.tar.gz` files.
+3. Install [Scaper](https://github.com/justinsalamon)
+4. Generate soundscapes from jams files by running this command with `--annpaths` and `--audiopath` set to the extracted folders:
 ```
 python ./data/generate_soundscapes.py \
 --annpath PATH-TO-FSD_MIX_SED.annotations \
 --audiopath PATH-TO-FSD_MIX_SED.source \
 --savepath PATH-TO-SAVE-OUTPUT
 ```
-Note that the output is ~450GB with 281,039 audio files.
+Note this will generate 281,039 audio files with a size of ~450GB.
 
 If you want to get the foreground material (FSD-MIX-SED.source) directly from FSD50K instead of downloading them, run
 ```
@@ -54,7 +55,7 @@ python ./data/preprocess_foreground_sounds.py \
 We provide source code to train the best performing embedding model (pretrained OpenL3 + FC) and three different few-shot methods to predict both base and novel class data.  
 
 ## Preprocessing
-Once audio files are reproduced, we pre-compute OpenL3 embeddings of clips in FSD-MIX-CLIPS and save them by running
+Once audio files are reproduced, we pre-compute OpenL3 embeddings of clips in FSD-MIX-CLIPS and save them by running: 
 ```
 python get_openl3emb_and_filelist.py \
 --annpath PATH-TO-FSD_MIX_CLIPS.annotations \
