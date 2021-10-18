@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
                 filelist = get_openl3_and_filelists(annfile, audiofolder=audiofolder, savefolder=savefolder, overwrite=False)
 
-                with open(class_split+'_'+data_split+'.pkl', 'wb') as f:
+                with open(class_split+'_'+data_split+'_filelist.pkl', 'wb') as f:
                     pkl.dump(filelist, f, protocol=pkl.HIGHEST_PROTOCOL)
         else:
             annfile = join(args.annpath, 'novel_' + class_split + '.csv')
@@ -66,5 +66,5 @@ if __name__ == '__main__':
 
             filelist = get_openl3_and_filelists(annfile, audiofolder=audiofolder, savefolder=savefolder, overwrite=False)
 
-            with open(class_split + '.pkl', 'wb') as f:
+            with open(class_split + '_filelist.pkl', 'wb') as f:
                 pkl.dump(filelist, f, protocol=pkl.HIGHEST_PROTOCOL)

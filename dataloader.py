@@ -14,7 +14,7 @@ from abc import abstractmethod
 
 
 # Set the appropriate paths of the datasets here.
-DATASET_DIR = '/scratch/yw3004/data/active-fewshot/dict_files'
+FILELIST_DIR = './'
 
 
 def buildLabelIndex(labels):
@@ -35,13 +35,13 @@ def load_data(file):
 
 
 class SimpleDataset:
-    def __init__(self, eval_file, backbone='pann', openl3=False):
+    def __init__(self, eval_file, openl3=False):
         self.eval = pickle.load(open(eval_file, 'rb'))
         self.data = self.eval['data']
         self.labels = self.eval['labels']
-        self.backbone = backbone
-        self.start_frame = self.eval['start_frame']
         self.openl3 = openl3
+        if not self.openl3:
+            self.start_frame = self.eval['start_frame']
 
     def __getitem__(self, index):
         path, label = self.data[index], self.labels[index]
@@ -61,54 +61,13 @@ class SimpleDataset:
             start = self.start_frame[index]
             mel = mel[:, start:start + 100]
 
-            # if self.backbone == 'pann':
             mel = np.expand_dims(mel, -1)  # (nmel, nframe, 1)
             mel = torch.from_numpy(mel)
-            # else:
-            #     # All segments.
-            #     num_frames = 100
-            #     all_frames = mel.shape[1]
-            #     hop_size = num_frames // 2  # 50% overlapped windows
-            #     num_segment = int((all_frames - num_frames) / hop_size) + 1
-            #
-            #     mels = np.zeros((num_segment, 64, num_frames))
-            #     for seg_iter in range(num_segment):
-            #         mels[seg_iter] = mel[:, seg_iter * hop_size:seg_iter * hop_size + num_frames]
-            #     mels = np.expand_dims(mels, axis=1)
-            #     mel = torch.from_numpy(mels)
 
             return mel, multihot_label
 
     def __len__(self):
         return len(self.data)
-
-#
-# class SimpleBaseDataset:
-#     def __init__(self, base_file, base_tag, backbone='pann', openl3=False):
-#         self.data = base_file[base_tag]
-#         self.backbone = backbone
-#         self.openl3 = openl3
-#
-#     def __getitem__(self, index):
-#         path = self.data[index]
-#
-#         if self.openl3:
-#             emb = np.load(path, mmap_mode='r')
-#             emb = torch.from_numpy(emb)
-#             return emb
-#         else:
-#             mel = np.load(path, mmap_mode='r')
-#             mel = mel[:, :1000]  # truncate if too long
-#             if mel.shape[1] < 1000:  # pad if too short
-#                 mel = np.pad(mel, ((0, 0), (0, 1000 - mel.shape[1])), 'constant')
-#
-#             mel = np.expand_dims(mel, -1)  # (nmel, nframe, 1)
-#             mel = torch.from_numpy(mel)
-#
-#             return mel
-#
-#     def __len__(self):
-#         return len(self.data)
 
 
 class DataManager:
@@ -121,7 +80,7 @@ class SimpleDataManager(DataManager):
         super(SimpleDataManager, self).__init__()
         self.batch_size = batch_size
 
-    def get_data_loader(self, eval_file, backbone='pann', openl3=False):  # parameters that would change on train/val set
+    def get_data_loader(self, eval_file, openl3=False):  # parameters that would change on train/val set
         """
         Build a DataLoader based on filelist
         Parameters
@@ -131,64 +90,36 @@ class SimpleDataManager(DataManager):
         -------
         data_loader: DataLoader object
         """
-        dataset = SimpleDataset(eval_file, backbone, openl3)
+        dataset = SimpleDataset(eval_file, openl3)
         data_loader_params = dict(batch_size=self.batch_size, shuffle=False, num_workers=12, pin_memory=True)
         data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
         return data_loader
 
-#
-# class SimpleBaseDataManager(DataManager):
-#     def __init__(self, batch_size):
-#         super(SimpleBaseDataManager, self).__init__()
-#         self.batch_size = batch_size
-#
-#     def get_data_loader(self, base_file, base_tag, backbone='pann'):  # parameters that would change on train/val set
-#         """
-#         Build a DataLoader based on filelist
-#         Parameters
-#         ----------
-#         data_file: A filelist with datapaths and class labels
-#         Returns
-#         -------
-#         data_loader: DataLoader object
-#         """
-#         dataset = SimpleBaseDataset(base_file, base_tag, backbone)
-#         data_loader_params = dict(batch_size=self.batch_size, shuffle=False, num_workers=12, pin_memory=True)
-#         data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
-#         return data_loader
-
 
 class FSD_MIX_CLIPS(data.Dataset):
     def __init__(self, phase='train', openl3=False):
-
         self.base_folder = 'fsd_mix_clips'
         assert(phase=='train' or phase=='val' or phase=='test')
         self.phase = phase
         self.name = 'fsd_mix_clips_' + phase
         self.openl3 = openl3
+        if not self.openl3:
+            self.start_frame = self.eval['start_frame']
 
-        print('Loading FSD_MIX_CLIPS dataset - phase {0}'.format(phase))
-        datapath = DATASET_DIR
-        file_train_phase = 'train'
-        file_val_phase = 'val'
-        file_test_phase = 'test'
+        print('Loading fsdSED dataset - phase {0}'.format(phase))
 
-        if self.openl3:
-            file_train_phase = 'openl3_' + file_train_phase
-            file_val_phase = 'openl3_' + file_val_phase
-            file_test_phase = 'openl3_' + file_test_phase
-
-        file_train_phase = join(datapath, file_train_phase+'.pkl')
-        file_val_phase = join(datapath, file_val_phase+'.pkl')
-        file_test_phase = join(datapath, file_test_phase+'.pkl')
+        file_train_categories_train_phase = 'base_train_filelist.pkl'
+        file_train_categories_val_phase = 'base_val_filelist.pkl'
+        file_train_categories_test_phase = 'base_test_filelist.pkl'
+        file_val_categories_val_phase = 'val_filelist.pkl'
+        file_test_categories_test_phase = 'test_filelist.pkl'
 
         if self.phase=='train':
             # During training phase we only load the training phase images
             # of the training categories (aka base categories).
-            data_train = load_data(file_train_phase)
+            data_train = load_data(file_train_categories_train_phase)
             self.data = data_train['data']
             self.labels = data_train['labels']
-            self.start_frame = data_train['start_frame']
 
             self.label2ind = buildLabelIndex(self.labels)
             self.labelIds = sorted(self.label2ind.keys())
@@ -198,22 +129,29 @@ class FSD_MIX_CLIPS(data.Dataset):
 
         elif self.phase=='val' or self.phase=='test':
             if self.phase=='test':
-                data_test = load_data(file_test_phase)
-                self.data = data_test['data']
-                self.labels = data_test['labels']
-                self.start_frame = data_test['start_frame']
+                # load data that will be used for evaluating the recognition
+                # accuracy of the base categories.
+                data_base = load_data(file_train_categories_test_phase)
+                # load data that will be use for evaluating the few-shot recogniton
+                # accuracy on the novel categories.
+                data_novel = load_data(file_test_categories_test_phase)
             else: # phase=='val'
-                data_val = load_data(file_val_phase)
-                self.data = data_val['data']
-                self.labels = data_val['labels']
-                self.start_frame = data_val['start_frame']
+                # load data that will be used for evaluating the recognition
+                # accuracy of the base categories.
+                data_base = load_data(file_train_categories_val_phase)
+                # load data that will be use for evaluating the few-shot recogniton
+                # accuracy on the novel categories.
+                data_novel = load_data(file_val_categories_val_phase)
+
+            self.data = np.concatenate([data_base['data'], data_novel['data']], axis=0)
+            self.labels = data_base['labels'] + data_novel['labels']
 
             self.label2ind = buildLabelIndex(self.labels)
             self.labelIds = sorted(self.label2ind.keys())
             self.num_cats = len(self.labelIds)
 
-            self.labelIds_base = self.labelIds[:43]
-            self.labelIds_novel = self.labelIds[43:]
+            self.labelIds_base = buildLabelIndex(data_base['labels']).keys()
+            self.labelIds_novel = buildLabelIndex(data_novel['labels']).keys()
             self.num_cats_base = len(self.labelIds_base)
             self.num_cats_novel = len(self.labelIds_novel)
             intersection = set(self.labelIds_base) & set(self.labelIds_novel)
