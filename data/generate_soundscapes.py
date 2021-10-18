@@ -7,14 +7,14 @@ import argparse
 def generate(jamspath, sourcepath, savepath, class_split, data_split):
     # set paths
     jamsfolder = join(jamspath, class_split)
-    savefolder = join(savepath, class_split)
+    savefolder = join(savepath, 'FSD_MIX_SED.audio', class_split)
     fg_path = join(sourcepath, 'foreground', class_split)
     bg_path = join(sourcepath, 'background')
 
     # For base classes, data are further split into train/val/test folders
     if data_split:
         jamsfolder = join(jamsfolder, data_split)
-        savefolder = join(savefolder, data_split)
+        savefolder = join(savefolder, 'FSD_MIX_SED.audio', data_split)
         fg_path = join(fg_path, data_split)
 
     if not isdir(savefolder):
