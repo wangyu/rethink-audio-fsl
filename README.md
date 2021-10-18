@@ -1,13 +1,15 @@
 # rethink-audio-fsl
-Who calls the shots? Rethinking Few-Shot Learning for Audio (WASPAA 2021)
+This repo contains the source code for the paper "Who calls the shots? Rethinking Few-Shot Learning for Audio." (WASPAA 2021)
 
 **Table of Contents**
 - [Setup](#setup)
 - [Dataset](#dataset)
-- [Experiments](#experiment)
-- [Preprocessing](#preprocessing)
-- [Training](#training)
-- [Evaluation](#evaluation)
+- [Experiment](#experiment)
+  - [Preprocessing](#preprocessing)
+  - [Training](#training)
+  - [Evaluation](#evaluation)
+- [Reference](#reference)
+- [Citation](#citation)
 
 
 ## Setup
@@ -134,4 +136,13 @@ python save_features.py --config=openl3CosineClassifier --openl3
 # Train binary logistic regression models, predict test data, and compute metrics
 python logistic_regression.py --config=openl3CosineClassifier --openl3 --niter 10 --n_base 59 --n_novel 15 --n_pos 5 --n_neg 100
 ```
+
+## Reference
+This code is built upon the implementation from [FewShotWithoutForgetting](https://github.com/gidariss/FewShotWithoutForgetting)
+
+## Citation
+Please cite our paper if you find the code or dataset useful for your research.
+
+Y. Wang, N. J. Bryan, J. Salamon, M. Cartwright, and J. P. Bello. "Who calls the shots? Rethinking Few-shot Learning for Audio", IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA), 2021
+
 
