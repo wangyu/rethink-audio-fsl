@@ -3,28 +3,14 @@ This repo contains the source code for the paper "Who calls the shots? Rethinkin
 
 **Table of Contents**
 - [Dataset](#dataset)
-- [Setup](#setup)
 - [Experiment](#experiment)
   - [Preprocessing](#preprocessing)
+  - [Environment](#environment)
   - [Training](#training)
   - [Evaluation](#evaluation)
 - [Reference](#reference)
 - [Citation](#citation)
 
-
-## Setup
-1. Clone the repo.
-
-```
-git clone git@github.com:wangyu/rethink-audio-fsl.git 
-```
-2. Create `conda` environment from the `environment.yml` file and activate it. 
-
-Note that you only need the environment if you want to train/evaluate the models. For reproducing the dataset, see [Dataset](#dataset).   
-```
-conda env create -f environment.yml
-conda activate dfsl
-```
 
 ## Dataset
 Models in this work are trained on [FSD-MIX-CLIPS](https://zenodo.org/record/5574135#.YWyINEbMIWo), an open dataset of programmatically mixed audio clips with a controlled level of polyphony and signal-to-noise ratio. We use single-labeled clips from [FSD50K](https://zenodo.org/record/4060432#.YWyLAEbMIWo) as the source material for the foreground sound events and Brownian noise as the background to generate 281,039 10-second strongly-labeled soundscapes with [Scaper](https://github.com/justinsalamon). We refer this (intermediate) dataset of 10s soundscapes as FSD-MIX-SED. Each soundscape contains n events from n different sound classes where n is ranging from 1 to 5. We then extract 614,533 1s clips centered on each sound event in the soundscapes in FSD-MIX-SED to produce FSD-MIX-CLIPS. 
@@ -34,10 +20,10 @@ Due to the large size of the dataset, instead of releasing the raw audio files, 
 To reproduce FSD-MIX-SED:
 1. Download all files from [Zenodo](https://zenodo.org/record/5574135#.YWyINEbMIWo).
 2. Extract `.tar.gz` files. You will get
-- `FSD_MIX_SED.annotations`
-- `FSD_MIX_SED.source`
-- `FSD_MIX_CLIPS.annotations`
-- `vocab.json`
+- `FSD_MIX_SED.annotations`:  281,039 annotation files, 35GB 
+- `FSD_MIX_SED.source`: 10,296 single-labeled audio clips, 1.9GB
+- `FSD_MIX_CLIPS.annotations`: 5 annotation files for each class/data split
+- `vocab.json`: 89 classes, each class is then labeled by its index in the list in following experiments. 0-58: base, 59-73: novel-val, 74-88: novel-test. 
 
 We will use `FSD_MIX_SED.annotations` and `FSD_MIX_SED.source` to reproduce the audio data in `FSD_MIX_SED`, and use the audio with `FSD_MIX_CLIPS.annotation` for the following training and evaluation.
 
@@ -61,8 +47,11 @@ python ./data/preprocess_foreground_sounds.py \
 ## Experiment
 We provide source code to train the best performing embedding model (pretrained OpenL3 + FC) and three different few-shot methods to predict both base and novel class data.  
 
+
 ## Preprocessing
-Once audio files are reproduced, we pre-compute OpenL3 embeddings of clips in FSD-MIX-CLIPS and save them by running: 
+Once audio files are reproduced, we pre-compute OpenL3 embeddings of clips in FSD-MIX-CLIPS and save them.
+1. Install [OpenL3](https://github.com/marl/openl3)
+2. Set paths of the downloaded `FSD_MIX_CLIPS.annotations` and generated `FSD_MIX_SED.audio`, and run 
 ```
 python get_openl3emb_and_filelist.py \
 --annpath PATH-TO-FSD_MIX_CLIPS.annotations \
@@ -70,6 +59,16 @@ python get_openl3emb_and_filelist.py \
 --savepath PATH_TO_SAVE_OUTPUT
 ```
 This generates 614,533 `.pkl` files where each file contains an embedding. A set of filelists will also be saved under current folder.
+
+
+## Environment
+Create `conda` environment from the `environment.yml` file and activate it. 
+
+Note that you only need the environment if you want to train/evaluate the models. For reproducing the dataset, see [Dataset](#dataset).   
+```
+conda env create -f environment.yml
+conda activate dfsl
+```
 
 ## Training
 - Training configuration can be specified using config files in `./config`
