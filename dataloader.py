@@ -51,7 +51,7 @@ class SimpleDataset:
             multihot_label[t] = 1
 
         if self.openl3:
-            emb = np.load(path, mmap_mode='r')
+            emb = pickle.load(open(path, 'rb'))
             emb = torch.from_numpy(emb)
             return emb, multihot_label
         else:
@@ -165,7 +165,7 @@ class FSD_MIX_CLIPS(data.Dataset):
         path, label = self.data[index], self.labels[index]
 
         if self.openl3:
-            emb = np.load(path, mmap_mode='r')
+            emb = pickle.load(open(path, 'rb'))
             return emb, label
         else:
             # # use this for pann backbone
