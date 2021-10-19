@@ -128,7 +128,7 @@ class FewShot(Algorithm):
     def process_batch_base_category_classification(self, batch, do_train=True):
         if self.openl3:
             features_test, labels_test, K, nKbase = batch
-            batch_size, num_test_examples, time_steps, n_dim = features_test.size()
+            batch_size, num_test_examples, n_dim = features_test.size()
             new_batch_dim = batch_size * num_test_examples
             features_test = move_data_to_device(features_test, 'cuda')
 
@@ -141,7 +141,7 @@ class FewShot(Algorithm):
                     # in eval mode).
                     activate_dropout_units(self.networks['feat_model'])
 
-            features_test = self.networks['feat_model'](features_test.view(new_batch_dim, time_steps, n_dim))
+            features_test = self.networks['feat_model'](features_test.view(new_batch_dim, n_dim))
             features_test = features_test.view([batch_size, num_test_examples, ] + list(features_test.size()[1:]))
 
         else:
@@ -225,7 +225,7 @@ class FewShot(Algorithm):
     def process_batch_fewshot_without_forgetting(self, batch, do_train=True):
         if self.openl3:
             features_train_var, labels_train, features_test_var, labels_test, K, nKbase = batch
-            batch_size, num_train_examples, time_steps, n_dim = features_train_var.size()
+            batch_size, num_train_examples, n_dim = features_train_var.size()
             num_test_examples = features_test_var.size(1)
             features_train_var = move_data_to_device(features_train_var, 'cuda')
             features_test_var = move_data_to_device(features_test_var, 'cuda')
@@ -239,8 +239,8 @@ class FewShot(Algorithm):
                     # in eval mode).
                     activate_dropout_units(self.networks['feat_model'])
 
-            features_train_var = self.networks['feat_model'](features_train_var.view(batch_size * num_train_examples, time_steps, n_dim))
-            features_test_var = self.networks['feat_model'](features_test_var.view(batch_size * num_test_examples, time_steps, n_dim))
+            features_train_var = self.networks['feat_model'](features_train_var.view(batch_size * num_train_examples, n_dim))
+            features_test_var = self.networks['feat_model'](features_test_var.view(batch_size * num_test_examples, n_dim))
             features_train_var = features_train_var.view([batch_size, num_train_examples, ] + list(features_train_var.size()[1:]))
             features_test_var = features_test_var.view([batch_size, num_test_examples, ] + list(features_test_var.size()[1:]))
 
