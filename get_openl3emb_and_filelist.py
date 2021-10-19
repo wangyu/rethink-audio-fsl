@@ -1,5 +1,6 @@
 import os
-from os.path import isfile, join
+from os import makedirs
+from os.path import isfile, join, isdir
 import pandas as pd
 import pickle as pkl
 import argparse
@@ -18,10 +19,10 @@ def get_openl3_and_filelists(annfile, audiofolder, savefolder, overwrite=False):
     for idx in range(len(ann)):
         fname = ann['filename'][idx]
         start_time = ann['start_time'][idx]
-        labels = [int(x) for x in ann['labels'][1][1:-1].split(',')]  # convert string to list of int
+        labels = [int(x) for x in ann['labels'][idx][1:-1].split(',')]  # convert string to list of int
 
-        start_sample =  int(start_time * 44100)
-        outfile = savefolder + fname + '_' + str(start_sample)+ '.pkl'
+        start_sample = int(start_time * 44100)
+        outfile = join(savefolder, fname.replace('.wav', '_'+ str(start_sample)+ '.pkl'))
 
         if not isfile(outfile) or overwrite:
             audio, sr = sf.read(join(audiofolder, fname))
@@ -53,7 +54,9 @@ if __name__ == '__main__':
             for data_split in ['train', 'val', 'test']:
                 annfile = join(args.annpath, class_split + '_' + data_split + '.csv')
                 audiofolder = join(args.audiopath, class_split, data_split)
-                savefolder = join(args.savepath, class_split, data_split)
+                savefolder = join(args.savepath, 'FSD_MIX_CLIPS.openl3', class_split, data_split)
+                if not isdir(savefolder):
+                    makedirs(savefolder)
 
                 filelist = get_openl3_and_filelists(annfile, audiofolder=audiofolder, savefolder=savefolder, overwrite=False)
 
@@ -62,7 +65,9 @@ if __name__ == '__main__':
         else:
             annfile = join(args.annpath, 'novel_' + class_split + '.csv')
             audiofolder = join(args.audiopath, class_split)
-            savefolder = join(args.savepath, class_split)
+            savefolder = join(args.savepath, 'FSD_MIX_CLIPS.openl3', class_split)
+            if not isdir(savefolder):
+                makedirs(savefolder)
 
             filelist = get_openl3_and_filelists(annfile, audiofolder=audiofolder, savefolder=savefolder, overwrite=False)
 
