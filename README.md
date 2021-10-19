@@ -28,7 +28,7 @@ To reproduce FSD-MIX-SED:
 We will use `FSD_MIX_SED.annotations` and `FSD_MIX_SED.source` to reproduce the audio data in `FSD_MIX_SED`, and use the audio with `FSD_MIX_CLIPS.annotation` for the following training and evaluation.
 
 3. Install [Scaper](https://github.com/justinsalamon)
-4. Generate soundscapes from jams files by running this command with `--annpaths` and `--audiopath` set to the extracted folders:
+4. Generate soundscapes from jams files by running the command. Set `annpaths` and `audiopath` to the extracted folders, and `savepath` to the desired path to save output audio files.
 ```
 python ./data/generate_soundscapes.py \
 --annpath PATH-TO-FSD_MIX_SED.annotations \
