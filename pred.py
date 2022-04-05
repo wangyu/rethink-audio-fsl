@@ -45,6 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--niter', type=int, default=100, help='number of evaluation iteration')
     parser.add_argument('--poly', type=str, default='1', help='1/mix, polyphony of support examples')
     parser.add_argument('--snr', type=str, default='mix', help='mix/low/high, snr of support examples')
+    parser.add_argument('--openl3', action='store_true', help='use reduced classes')
     args = parser.parse_args()
 
     # load config file, set exp folder
