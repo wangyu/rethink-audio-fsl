@@ -73,8 +73,8 @@ if __name__ == '__main__':
 
     # load pre-computed features of base and novel eval tracks
     base_feat_filename, novel_feat_filename = 'eval_base', 'eval_novel'
-    base_featfile = join(exp_directory, 'features', base_feat_filename+ 'poly.hdf5')
-    novel_featfile = join(exp_directory, 'features', novel_feat_filename + 'poly.hdf5')
+    base_featfile = join(exp_directory, 'features', base_feat_filename+ '.hdf5')
+    novel_featfile = join(exp_directory, 'features', novel_feat_filename + '.hdf5')
 
     base_feats, base_labels = feat_loader(base_featfile)
     novel_feats, novel_labels = feat_loader(novel_featfile)
