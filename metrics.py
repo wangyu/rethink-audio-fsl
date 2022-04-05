@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     # load labels file
     eval_tracks_with_base_tags = pkl.load(open('base_test_filelist.pkl', 'rb'))
-    eval_tracks_with_novel_tags = pkl.load(open('test_query_filelist.pkl'), 'rb')
+    eval_tracks_with_novel_tags = pkl.load(open('test_query_filelist.pkl', 'rb'))
     # if args.poly == 'mix':
     #     eval_tracks_with_novel_tags = pkl.load(open(join(pklpath, 'fsd_test_openl3_mixed.pickle'), 'rb'))
 
