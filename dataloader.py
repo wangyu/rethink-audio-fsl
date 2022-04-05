@@ -46,7 +46,7 @@ class SimpleDataset:
     def __getitem__(self, index):
         path, label = self.data[index], self.labels[index]
 
-        multihot_label = torch.zeros((87,))
+        multihot_label = torch.zeros((89,))
         for t in label:
             multihot_label[t] = 1
 
