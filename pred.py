@@ -93,7 +93,7 @@ if __name__ == '__main__':
     n_all_examples = feats_all.shape[1]
 
     # load support example filelist
-    test_support_filelist = pkl.load(open('test_support_filelist.pkl'),'rb')
+    test_support_filelist = pkl.load(open('test_support_filelist.pkl','rb'))
     # support_snr_idx = pkl.load(open(join(datadir, 'fsd_test_support_idx_openl3.pickle'), 'rb'))
     # if args.poly == 'mix':
     #     unlabeled_train_tracks_with_novel_tags = pkl.load(open(join(datadir, 'fsd_test_support_openl3_mixed.pickle'), 'rb'))
