@@ -117,7 +117,7 @@ python save_features.py --config=openl3CosineClassifier --openl3
 python pred.py --config=openl3CosineClassifier --openl3 --niter 100 --n_base 59 --n_novel 15 --n_pos 5
 
 # compute and save evaluation metrics based on model prediction
-python metrics.py --config=audioset_pannCosineClassifier --openl3 --n_base 59 --n_novel 15 --n_pos 5
+python metrics.py --config=openl3CosineClassifier --openl3 --n_base 59 --n_novel 15 --n_pos 5
 ```
 
 ### 2. DFSL
@@ -129,7 +129,7 @@ python save_features.py --config=openl3CosineClassifierGenWeightAttN5 --openl3
 python pred.py --config=openl3CosineClassifierGenWeightAttN5 --openl3 --niter 100 --n_base 59 --n_novel 15 --n_pos 5
 
 # compute and save evaluation metrics based on model prediction
-python metrics.py --config=audioset_pannCosineClassifierGenWeightAttN5 --openl3 --n_base 59 --n_novel 15 --n_pos 5
+python metrics.py --config=openl3CosineClassifierGenWeightAttN5 --openl3 --n_base 59 --n_novel 15 --n_pos 5
 ```
 
 ### 3. Logistic regression
