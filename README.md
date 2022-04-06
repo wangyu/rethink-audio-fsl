@@ -114,10 +114,10 @@ For evaluation, we compute features for both base and novel test data, then make
 python save_features.py --config=openl3CosineClassifier --openl3
 
 # Get and save model prediction, run this multiple time (niter) to count for random selection of novel examples.
-python pred.py --config=openl3CosineClassifier --openl3 --niter 100 --n_base 59 --n_novel 15 --n_pos 5
+python pred.py --config=openl3CosineClassifier --niter 100 --n_base 59 --n_novel 15 --n_pos 5
 
 # compute and save evaluation metrics based on model prediction
-python metrics.py --config=openl3CosineClassifier --openl3 --n_base 59 --n_novel 15 --n_pos 5
+python metrics.py --config=openl3CosineClassifier --n_base 59 --n_novel 15 --n_pos 5
 ```
 
 ### 2. DFSL
@@ -126,10 +126,10 @@ python metrics.py --config=openl3CosineClassifier --openl3 --n_base 59 --n_novel
 python save_features.py --config=openl3CosineClassifierGenWeightAttN5 --openl3
 
 # Get and save model prediction, run this multiple time (niter) to count for random selection of novel examples.
-python pred.py --config=openl3CosineClassifierGenWeightAttN5 --openl3 --niter 100 --n_base 59 --n_novel 15 --n_pos 5
+python pred.py --config=openl3CosineClassifierGenWeightAttN5 --niter 100 --n_base 59 --n_novel 15 --n_pos 5
 
 # compute and save evaluation metrics based on model prediction
-python metrics.py --config=openl3CosineClassifierGenWeightAttN5 --openl3 --n_base 59 --n_novel 15 --n_pos 5
+python metrics.py --config=openl3CosineClassifierGenWeightAttN5 --n_base 59 --n_novel 15 --n_pos 5
 ```
 
 ### 3. Logistic regression
@@ -144,7 +144,7 @@ Train a binary logistic regression model for each novel class. Note that we need
 python save_features.py --config=openl3CosineClassifier --openl3
 
 # Train binary logistic regression models, predict test data, and compute metrics
-python logistic_regression.py --config=openl3CosineClassifier --openl3 --niter 10 --n_base 59 --n_novel 15 --n_pos 5 --n_neg 100
+python logistic_regression.py --config=openl3CosineClassifier --niter 10 --n_base 59 --n_novel 15 --n_pos 5 --n_neg 100
 ```
 
 ## Reference

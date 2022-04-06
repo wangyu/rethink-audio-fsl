@@ -55,7 +55,6 @@ if __name__ == '__main__':
     parser.add_argument('--n_base', type=int, default=59, help='number of base tags')
     parser.add_argument('--n_novel', type=int, default=15, help='number of novel tags')
     parser.add_argument('--n_pos', type=int, default=5, help='number of positive support examples')
-    parser.add_argument('--openl3', action='store_true', help='use reduced classes')
     parser.add_argument('--poly', type=str, default='1', help='polyphony of support examples')
     parser.add_argument('--snr', type=str, default='mix', help='mix/low/high, snr of support examples')
     args = parser.parse_args()
