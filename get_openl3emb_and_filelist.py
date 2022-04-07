@@ -22,7 +22,8 @@ def get_openl3_and_filelists(annfile, audiofolder, savefolder, overwrite=False):
         labels = [int(x) for x in ann['labels'][idx][1:-1].split(',')]  # convert string to list of int
 
         start_sample = int(start_time * 44100)
-        outfile = join(savefolder, fname.replace('.wav', '_'+ str(start_sample)+ '.pkl'))
+#         outfile = join(savefolder, fname.replace('.wav', '_'+ str(start_sample)+ '.pkl'))
+        outfile = join(savefolder, fname.replace('.wav', '_' + str(start_sample) + '_' + str(idx) + '.pkl'))
 
         if not isfile(outfile) or overwrite:
             audio, sr = sf.read(join(audiofolder, fname))
