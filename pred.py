@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     # Pred
     # pred with base classes only
-    scores_base, att_coeff_base, novel_weight = get_score(algorithm.networks['classifier'], features_test=feats_all,
+    scores_base, att_coeff_base, novel_weight = get_score(algorithm.networks['classifier'], features_test=base_feats,
                                                           Kbase_ids=Kbase, features_train=None, labels_train=None)
 
     # pred with base+novel classes
