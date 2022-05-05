@@ -40,8 +40,10 @@ def filter_pp_rating(ratings, vocab, inter_nodes, files):
         # convert mids to labels
         labels = [vocab[1][np.where(vocab[2] == mid)[0][0]] for mid in mids if mid in vocab[2].values]
         leaf_labels = list(set(labels) - set(inter_nodes))
-
-        if len(leaf_labels) == 1 and all(x == 1.0 for x in ratings[file][leaf_labels[0]]):
+        # covert leaf_labels to mids        
+        leaf_mids = [vocab[2][np.where(vocab[1] == label)[0][0]] for label in leaf_labels if label in vocab[1].values]
+        
+        if len(leaf_labels) == 1 and all(x == 1.0 for x in ratings[file][leaf_mids[0]]):
             singlePP_files.append(file)
 
     return singlePP_files
