@@ -110,7 +110,7 @@ if __name__ == '__main__':
     short_files_eval = filter_duration(max_duration=args.max_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
 
     # Get dictionaries with filtered files: single-labeled, PP-rating, shorter than max duration
-    class_to_shortPP_file_dev = {cl: list(set(class_to_file_dev[cl]) & set(short_files_dev)) for cl in class_to_file_dev}
+    class_to_shortPP_file_dev = {cl: list(set(class_to_file_dev[cl]) & set(short_files_dev) & set(PP_files_dev)) for cl in class_to_file_dev}
     class_to_short_file_eval = {cl: list(set(class_to_file_eval[cl]) & set(short_files_eval)) for cl in class_to_file_eval}
 
     # Filter out rare classes
