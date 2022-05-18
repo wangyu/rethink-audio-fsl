@@ -106,8 +106,8 @@ if __name__ == '__main__':
     audiopath_dev = join(args.fsdpath, 'FSD50K.dev_audio')
     audiopath_eval = join(args.fsdpath, 'FSD50K.eval_audio')
 
-    short_files_dev = filter_duration(max_duration=args.max_duration, audiopath=audiopath_dev, files=PP_files_dev)
-    short_files_eval = filter_duration(max_duration=args.max_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
+    short_files_dev = filter_duration(max_duration=args.max_clip_duration, audiopath=audiopath_dev, files=PP_files_dev)
+    short_files_eval = filter_duration(max_duration=args.max_clip_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
 
     # Get dictionaries with filtered files: single-labeled, PP-rating, shorter than max duration
     class_to_shortPP_file_dev = {cl: list(set(class_to_file_dev[cl]) & set(short_files_dev)) for cl in class_to_file_dev}
