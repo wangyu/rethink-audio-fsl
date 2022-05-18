@@ -40,8 +40,10 @@ def filter_pp_rating(ratings, vocab, inter_nodes, files):
         # convert mids to labels
         labels = [vocab[1][np.where(vocab[2] == mid)[0][0]] for mid in mids if mid in vocab[2].values]
         leaf_labels = list(set(labels) - set(inter_nodes))
-
-        if len(leaf_labels) == 1 and all(x == 1.0 for x in ratings[file][leaf_labels[0]]):
+        # covert leaf_labels to mids        
+        leaf_mids = [vocab[2][np.where(vocab[1] == label)[0][0]] for label in leaf_labels if label in vocab[1].values]
+        
+        if len(leaf_labels) == 1 and all(x == 1.0 for x in ratings[file][leaf_mids[0]]):
             singlePP_files.append(file)
 
     return singlePP_files
@@ -106,8 +108,8 @@ if __name__ == '__main__':
     audiopath_dev = join(args.fsdpath, 'FSD50K.dev_audio')
     audiopath_eval = join(args.fsdpath, 'FSD50K.eval_audio')
 
-    short_files_dev = filter_duration(max_duration=args.max_duration, audiopath=audiopath_dev, files=PP_files_dev)
-    short_files_eval = filter_duration(max_duration=args.max_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
+    short_files_dev = filter_duration(max_duration=args.max_clip_duration, audiopath=audiopath_dev, files=PP_files_dev)
+    short_files_eval = filter_duration(max_duration=args.max_clip_duration, audiopath=audiopath_eval, files=list(file_to_class_eval.keys()))
 
     # Get dictionaries with filtered files: single-labeled, PP-rating, shorter than max duration
     class_to_shortPP_file_dev = {cl: list(set(class_to_file_dev[cl]) & set(short_files_dev)) for cl in class_to_file_dev}
